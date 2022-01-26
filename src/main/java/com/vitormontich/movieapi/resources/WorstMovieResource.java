@@ -26,8 +26,7 @@ public class WorstMovieResource {
 	
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<WorstMovie> findById(@PathVariable Long id) {
-		WorstMovie worst = worstMovieRepository.findById(id);
+		WorstMovie worst = worstMovieRepository.findById(id).get();
 		return ResponseEntity.ok().body(worst);
-		
 	}
 }
