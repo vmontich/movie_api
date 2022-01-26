@@ -34,3 +34,9 @@ build/
 
 ### Arquivo de Especificacao ###
 especificacaoBackend.pdf
+
+### Outros ###
+.DS_Store
+.metadata.mvn
+mvnw
+mvnw.cmd
