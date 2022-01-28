@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class WorstMovie implements Serializable{
+public class WorstMovie implements Serializable, Comparable<WorstMovie>{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -30,6 +30,11 @@ public class WorstMovie implements Serializable{
 		this.studios = studios;
 		this.producers = producers;
 		this.winner = winner;
+	}
+	
+	@Override
+	public int compareTo(WorstMovie o) {
+		return this.getYear().compareTo(o.getYear());
 	}
 
 	public Long getId() {
@@ -96,6 +101,4 @@ public class WorstMovie implements Serializable{
 		WorstMovie other = (WorstMovie) obj;
 		return Objects.equals(id, other.id);
 	}
-	
-	
 }
