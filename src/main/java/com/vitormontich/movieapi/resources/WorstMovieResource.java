@@ -1,7 +1,9 @@
 package com.vitormontich.movieapi.resources;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,16 +30,22 @@ public class WorstMovieResource {
 	
 	@GetMapping
 	public ResponseEntity<List<WorstMovie>> findAll() {
-		System.out.println("Método findAll");
 		List<WorstMovie> list = repository.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<WorstMovie> find(@PathVariable Long id) {
-		System.out.println("Método find");
-		WorstMovie worst = repository.findById(id).get();
+	public ResponseEntity<?> find(@PathVariable Long id) {
+		if(id == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		Optional<WorstMovie> optionalWorst = repository.findById(id);
+		if(optionalWorst.equals(Optional.empty())) {
+			return ResponseEntity.notFound().build();
+		}
+		WorstMovie worst = optionalWorst.get();
 		return ResponseEntity.ok().body(worst);
+		
 	}
 	
 	@GetMapping(value = "/get-periods")
@@ -47,22 +55,34 @@ public class WorstMovieResource {
 	}
 	
 	@PostMapping(value = "/create")
-	public ResponseEntity<WorstMovie> save(@RequestBody WorstMovie worst) {
-		System.out.println("Método Save");
+	public ResponseEntity<?> save(@RequestBody WorstMovie worst) {
 		WorstMovie wm = repository.save(worst);
-		return ResponseEntity.ok().body(wm);
+		return ResponseEntity.created(null).body(wm);
 	}
 	
 	@PutMapping(value = "/edit")
-	public ResponseEntity<WorstMovie> update(@RequestBody WorstMovie worst) {
-		System.out.println("Método Update");
+	public ResponseEntity<?> update(@RequestBody WorstMovie worst) {
+		if(worst.getId() == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		Optional<WorstMovie> optionalWorst = repository.findById(worst.getId());
+		if(optionalWorst.equals(Optional.empty())) {
+			return ResponseEntity.notFound().build();
+		}
 		WorstMovie wm = repository.save(worst);
 		return ResponseEntity.ok().body(wm);
 	}
 	
 	@DeleteMapping(value = "/delete/{id}")
-	public void delete(@PathVariable Long id) {
-		System.out.println("Método Delete");
+	public ResponseEntity<?> delete(@PathVariable Long id) {
+		if(id == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		Optional<WorstMovie> optionalWorst = repository.findById(id);
+		if(optionalWorst.equals(Optional.empty())) {
+			return ResponseEntity.notFound().build();
+		}
 		repository.deleteById(id);
+		return ResponseEntity.ok().body(optionalWorst.get());
 	}
 }
