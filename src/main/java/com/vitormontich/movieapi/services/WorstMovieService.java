@@ -35,12 +35,16 @@ public class WorstMovieService {
 				for(int i=0; i<producerWinner.size(); i++) {
 					years.add(producerWinner.get(i).getYear());
 				}
-				Period minPeriodAux = getMinPeriodByProducer(producerName, years);
-				Period maxPeriodAux = getMaxPeriodByProducer(producerName, years);
-				minPeriodsByProducers.add(minPeriodAux);
-				maxPeriodsByProducers.add(maxPeriodAux);
-				if(minPeriodAux.getInterval() < minInterval) minInterval = minPeriodAux.getInterval();
-				if(maxPeriodAux.getInterval() > maxInterval) maxInterval = maxPeriodAux.getInterval();
+				List<Period> minPeriodAux = getMinPeriodByProducer(producerName, years);
+				List<Period> maxPeriodAux = getMaxPeriodByProducer(producerName, years);
+				for(Period period : minPeriodAux) {
+					minPeriodsByProducers.add(period);
+					if(period.getInterval() < minInterval) minInterval = period.getInterval();
+				}
+				for(Period period : maxPeriodAux) {
+					maxPeriodsByProducers.add(period);
+					if(period.getInterval() > maxInterval) maxInterval = period.getInterval();
+				}
 			}
 		}
 		
@@ -65,7 +69,10 @@ public class WorstMovieService {
 		return minMaxPeriod;
 	}
 	
-	private Period getMinPeriodByProducer(String producer, List<Integer> years) {
+	private List<Period> getMinPeriodByProducer(String producer, List<Integer> years) {
+		
+		List<Period> list = new ArrayList<Period>();
+		
 		int interval = Integer.MAX_VALUE;
 		int previousWin = 0;
 		int followingWin = 0;
@@ -75,15 +82,48 @@ public class WorstMovieService {
 			}
 			int intervalAux = years.get(i+1) - years.get(i);
 			if(intervalAux < interval) {
+				list.clear();
 				interval = intervalAux;
-				previousWin = years.get(i);
-				followingWin = years.get(i+1);
 			}
+			
+			if(intervalAux > interval) { }
+			
+			previousWin = years.get(i);
+			followingWin = years.get(i+1);
+			list.add(new Period(producer, intervalAux, previousWin, followingWin));
 		}
-		Period period = new Period(producer, interval, previousWin, followingWin);
-		return period;
+
+		return list;
 	}
 	
+	private List<Period> getMaxPeriodByProducer(String producer, List<Integer> years) {
+		
+		List<Period> list = new ArrayList<Period>();
+		
+		int interval = Integer.MIN_VALUE;
+		int previousWin = 0;
+		int followingWin = 0;
+		for(int i=0; i<years.size(); i++) {
+			if(i == years.size()-1) {
+				break;
+			}
+			int intervalAux = years.get(i+1) - years.get(i);
+			if(intervalAux > interval) {
+				list.clear();
+				interval = intervalAux;
+			}
+			
+			if(intervalAux < interval) { }
+			
+			previousWin = years.get(i);
+			followingWin = years.get(i+1);
+			list.add(new Period(producer, intervalAux, previousWin, followingWin));
+		}
+
+		return list;
+	}
+	
+	/*
 	private Period getMaxPeriodByProducer(String producer, List<Integer> years) {
 		int interval = Integer.MIN_VALUE;
 		int previousWin = 0;
@@ -102,6 +142,7 @@ public class WorstMovieService {
 		Period period = new Period(producer, interval, previousWin, followingWin);
 		return period;
 	}
+	*/
 	
 	private HashSet<String> getProducersNameList(List<WorstMovie> list) {
 		HashSet<String> producers = new HashSet<String>();
